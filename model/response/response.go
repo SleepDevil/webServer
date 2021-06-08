@@ -2,6 +2,7 @@ package response
 
 import (
 	"net/http"
+	"yasi_audio/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +17,15 @@ const (
 	ERROR   = 7
 	SUCCESS = 0
 )
+
+type TaskResponse struct {
+	Task model.Task `json:"task"`
+}
+
+type GetTasksResponse struct {
+	Tasks interface{} `json:"tasks"`
+	Total int64       `json:"total"`
+}
 
 func Result(code int, data interface{}, msg string, c *gin.Context) {
 	c.JSON(http.StatusOK, Response{
@@ -35,4 +45,8 @@ func FailWithMessage(message string, c *gin.Context) {
 
 func OkWithDetailed(data interface{}, message string, c *gin.Context) {
 	Result(SUCCESS, data, message, c)
+}
+
+func OkWithMessage(message string, c *gin.Context) {
+	Result(SUCCESS, map[string]interface{}{}, message, c)
 }

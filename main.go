@@ -7,8 +7,9 @@ import (
 )
 
 func main() {
+	global.GVA_VP = core.Viper()
 	global.GVA_DB = initialize.Gorm()
-	// initialize.MysqlTables(global.GVA_DB)
-	core.RunWindowsServer()
 	initialize.Redis()
+	initialize.MysqlTables(global.GVA_DB)
+	core.RunWindowsServer()
 }

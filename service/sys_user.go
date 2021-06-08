@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"yasi_audio/global"
 	"yasi_audio/model"
 	"yasi_audio/utils"
@@ -22,8 +21,10 @@ func FindUserByUuid(uuid string) (err error, user *model.SysUser) {
 func Register(u model.SysUser) (err error, userInter model.SysUser) {
 	var user model.SysUser
 	if !errors.Is(global.GVA_DB.Where("username = ?", u.Username).First(&user).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
-		fmt.Println(user)
-		return errors.New("用户名已注册"), user
+		return errors.New("账号已被注册"), user
+	}
+	if !errors.Is(global.GVA_DB.Where("nick_name = ?", u.NickName).First(&user).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		return errors.New("用户名已被注册"), user
 	}
 	// 否则 附加uuid 密码md5简单加密 注册
 	u.Password = utils.MD5V([]byte(u.Password))
@@ -35,7 +36,6 @@ func Register(u model.SysUser) (err error, userInter model.SysUser) {
 func Login(u *model.SysUser) (err error, userInter *model.SysUser) {
 	var user model.SysUser
 	u.Password = utils.MD5V([]byte(u.Password))
-	fmt.Println(u)
 	err = global.GVA_DB.Where("username = ? AND password = ?", u.Username, u.Password).First(&user).Error
 	return err, &user
 }

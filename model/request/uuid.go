@@ -1,5 +1,5 @@
 package request
 
 type Uuid struct {
-	Uuid string `json:"Uuid"`
+	Invitation_Code string `json:"invitation_code"`
 }

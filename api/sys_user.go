@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 	"yasi_audio/global"
 	"yasi_audio/middleware"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 )
 
 func Register(c *gin.Context) {
@@ -21,12 +23,13 @@ func Register(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user := &model.SysUser{Username: R.Username, NickName: R.NickName, Password: R.Password, HeaderImg: R.HeaderImg}
+	user := &model.SysUser{Username: R.Username, NickName: R.NickName, Password: R.Password, HeaderImg: R.HeaderImg, OralScore: R.OralScore}
 	err, userReturn := service.Register(*user)
 	if err != nil {
 		response.FailWithDetailed(response.SysUserResponse{User: userReturn}, "注册失败，"+err.Error(), c)
 	} else {
 		response.OkWithDetailed(response.SysUserResponse{User: userReturn}, "注册成功", c)
+		service.ExpireInvitationCode(R.Invitation_Code)
 	}
 }
 
@@ -64,9 +67,35 @@ func tokenNext(c *gin.Context, user model.SysUser) {
 		response.FailWithMessage("获取token失败", c)
 		return
 	}
-	response.OkWithDetailed(response.LoginResponse{
-		User:      user,
-		Token:     token,
-		ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
-	}, "登录成功", c)
+	if err, jwtStr := service.GetRedisJWT(user.Username); err == redis.Nil {
+		if err := service.SetRedisJWT(token, user.Username); err != nil {
+			fmt.Println(err)
+			response.FailWithMessage("设置登录状态失败", c)
+			return
+		}
+		response.OkWithDetailed(response.LoginResponse{
+			User:      user,
+			Token:     token,
+			ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
+		}, "登录成功", c)
+	} else if err != nil {
+		fmt.Println(err)
+		response.FailWithMessage("设置登录状态失败", c)
+	} else {
+		var blackJWT model.JwtBlacklist
+		blackJWT.Jwt = jwtStr
+		if err := service.JsonInBlacklist(blackJWT); err != nil {
+			response.FailWithMessage("jwt作废失败", c)
+			return
+		}
+		if err := service.SetRedisJWT(token, user.Username); err != nil {
+			response.FailWithMessage("设置登录状态失败", c)
+			return
+		}
+		response.OkWithDetailed(response.LoginResponse{
+			User:      user,
+			Token:     token,
+			ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
+		}, "登录成功", c)
+	}
 }

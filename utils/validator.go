@@ -177,7 +177,7 @@ func isBlank(value reflect.Value) bool {
 	case reflect.String:
 		return value.Len() == 0
 	case reflect.Bool:
-		return !value.Bool()
+		return false
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return value.Int() == 0
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:

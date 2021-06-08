@@ -8,15 +8,25 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-// return的值为数据库中used的值，false为未使用过
-func CheckUuid(uuid string) (success bool) {
+// true为失败，false为成功
+func CheckUuid(uuid string) (success bool, msg string) {
 	var uuid_instance model.Uuid
-	global.GVA_DB.Where("`uuid` = ?", uuid).First(&uuid_instance)
+	err := global.GVA_DB.Where("`uuid` = ?", uuid).First(&uuid_instance).Error
+	fmt.Println(err)
+	if err != nil {
+		return true, "无效邀请码"
+	}
 	used := uuid_instance.Used
-	fmt.Println("used", used)
+	if used {
+		return true, "该验证码已被使用过"
+	} else {
+		return false, "该邀请码可以使用"
+	}
+}
+
+func ExpireInvitationCode(uuid string) {
+	var uuid_instance model.Uuid
 	global.GVA_DB.Model(&uuid_instance).Where("`uuid` = ?", uuid).Update("used", true)
-	fmt.Println("instanceUsed", uuid_instance.Used)
-	return used
 }
 
 func Invite() (success bool, invitation_code uuid.UUID) {

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"yasi_audio/model/request"
 	"yasi_audio/service"
 
@@ -21,14 +22,18 @@ func Invite(c *gin.Context) {
 func Check_Invited(c *gin.Context) {
 	var U request.Uuid
 	_ = c.ShouldBindJSON(&U)
-	if service.CheckUuid(U.Uuid) {
+	fmt.Println(U.Invitation_Code)
+	err := c.PostForm("Invitation_Code")
+	fmt.Println(err)
+	success, msg := service.CheckUuid(U.Invitation_Code)
+	if success {
 		c.JSON(200, gin.H{
-			"msg":     "该邀请码已经使用过",
+			"msg":     msg,
 			"success": "false",
 		})
 	} else {
 		c.JSON(200, gin.H{
-			"msg":     "该邀请码可以使用",
+			"msg":     msg,
 			"success": "true",
 		})
 	}

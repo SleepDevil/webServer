@@ -2,10 +2,10 @@ package initialize
 
 import (
 	"context"
+	"fmt"
 	"yasi_audio/global"
 
 	"github.com/go-redis/redis/v8"
-	"go.uber.org/zap"
 )
 
 var ctx = context.Background()
@@ -18,9 +18,10 @@ func Redis() {
 	})
 	pong, err := client.Ping(ctx).Result()
 	if err != nil {
-		global.GVA_LOG.Error("redis connect ping failed, err:", zap.Any("err", err))
+		print("失败")
+		fmt.Println(err)
 	} else {
-		global.GVA_LOG.Info("redis connect ping response:", zap.String("pong", pong))
+		fmt.Println("成功", pong)
 		global.GVA_REDIS = client
 	}
 }

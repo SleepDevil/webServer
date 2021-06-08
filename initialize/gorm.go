@@ -15,18 +15,22 @@ func Gorm() *gorm.DB {
 func MysqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
 		// model.SysUser{},
-		model.Uuid{},
+		// model.Task{},
+		// model.Room_Id{},
+		// model.JwtBlacklist{},
+		model.Audio_time{},
+		// model.Uuid{},
 	)
+	fmt.Println(err)
 	// if err != nil {
 	// 	global.GVA_LOG.Error("register table failed", zap.Any("err", err))
 	// 	os.Exit(0)
 	// }
 	// global.GVA_LOG.Info("register table success")
-	print(err)
 }
 
 func GormMysql() *gorm.DB {
-	dsn := "root" + ":" + "cjdsm123" + "@tcp(" + "127.0.0.1:3306" + ")/" + "android"
+	dsn := "root" + ":" + "cjdsm123" + "@tcp(127.0.0.1:3306)/android?charset=utf8mb4&parseTime=True&loc=Local"
 	mysqlConfig := mysql.Config{
 		DSN:                       dsn,   // DSN data source name
 		DefaultStringSize:         191,   // string 类型字段的默认长度

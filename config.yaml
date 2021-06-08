@@ -1,8 +1,8 @@
 # jwt configuration
 jwt:
-  signing-key: 'qmPlus'
-  expires-time: 604800
-  buffer-time: 86400
+  signing-key: 'SleepDevil'
+  expires-time: 6048000
+  buffer-time: 864000
 
 # zap logger configuration
 zap:
