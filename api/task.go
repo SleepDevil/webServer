@@ -24,7 +24,6 @@ func CreateTask(c *gin.Context) {
 	}
 	task := &model.Task{CreatedBy: T.CreatedBy, CreatedHead: T.CreatedHead, CreatedScore: T.CreatedScore, AcceptedBy: T.AcceptedBy, Accepted: T.Accepted, TargetScore: T.TargetScore, BattleTime: t, RoomId: T.RoomId}
 	err, taskReturn := service.CreateTask(*task)
-	fmt.Println(*task)
 	if err != nil {
 		response.FailWithDetailed(response.TaskResponse{Task: taskReturn}, ""+err.Error(), c)
 	} else {

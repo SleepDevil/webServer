@@ -26,31 +26,53 @@ func CreateRoom(c *gin.Context) {
 		response.FailWithMessage("时间格式不对", c)
 		return
 	}
-	fmt.Println(t, time.Now(), "===========================")
+	int64time := t.Unix() - time.Now().Unix() - 30
+	if int64time < 0 {
+		fmt.Println("时间已过期")
+		fmt.Println(int64time)
+		response.FailWithMessage("时间已过期", c)
+		return
+	}
+	time_gap := time.Duration(int64time)
+	fmt.Println(time_gap)
 	toekn := utils.GenerateToken(R.RoomId, R.Founder)
 	room := &model.Audio_time{Founder: R.Founder, AcceptedBy: R.AcceptedBy, RoomId: R.RoomId, BattleTime: t, Token: toekn}
-	err, roomReturn := service.CreateRoom(*room)
-	if err != nil {
-		response.FailWithDetailed(err.Error(), "创建失败", c)
-	} else {
-		response.OkWithDetailed(roomReturn, "创建成功", c)
-	}
+	response.OkWithMessage("创建成功", c)
+	time.AfterFunc(time.Second*time_gap, func() {
+		fmt.Println("timeafter后执行了！！！")
+		err, roomReturn := service.CreateRoom(*room)
+		if err != nil {
+			response.FailWithDetailed(err.Error(), "创建失败", c)
+		} else {
+			response.OkWithDetailed(roomReturn, "创建成功", c)
+		}
+	})
 }
 
 type FindToken struct {
 	RoomId string `json:"RoomId"`
 }
 
+type TokenResponst struct {
+	Token   string `json:"token"`
+	Teacher string `json:"teacher"`
+	Student string `json:"student"`
+}
+
 func GetToken(c *gin.Context) {
 	token := FindToken{}
 	fmt.Println(c.Request.Header)
+	fmt.Println(token, "===========")
 	err := c.ShouldBindJSON(&token)
 	fmt.Println(err)
+	fmt.Println(token.RoomId, "===========")
 	var room model.Audio_time
 	err = global.GVA_DB.Where("room_id = ?", token.RoomId).First(&room).Error
 	if err != nil {
 		response.FailWithDetailed(err.Error(), "失败", c)
 		return
 	}
-	response.OkWithDetailed(room.Token, "成功", c)
+
+	resData := TokenResponst{Token: room.Token, Teacher: room.Founder, Student: room.AcceptedBy}
+	response.OkWithDetailed(resData, "成功", c)
 }

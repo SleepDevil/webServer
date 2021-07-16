@@ -14,11 +14,11 @@ func Gorm() *gorm.DB {
 
 func MysqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
-		// model.SysUser{},
+		model.SysUser{},
 		// model.Task{},
 		// model.Room_Id{},
 		// model.JwtBlacklist{},
-		model.Audio_time{},
+		// model.Audio_time{},
 		// model.Uuid{},
 	)
 	fmt.Println(err)
@@ -42,6 +42,7 @@ func GormMysql() *gorm.DB {
 		//global.GVA_LOG.Error("MySQL启动异常", zap.Any("err", err))
 		//os.Exit(0)
 		//return nil
+
 		fmt.Println("error")
 		return nil
 	} else {

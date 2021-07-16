@@ -23,7 +23,7 @@ func Register(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user := &model.SysUser{Username: R.Username, NickName: R.NickName, Password: R.Password, HeaderImg: R.HeaderImg, OralScore: R.OralScore}
+	user := &model.SysUser{Username: R.Username, NickName: R.NickName, Password: R.Password, HeaderImg: R.HeaderImg, OralScore: R.OralScore, Identity: R.Identity}
 	err, userReturn := service.Register(*user)
 	if err != nil {
 		response.FailWithDetailed(response.SysUserResponse{User: userReturn}, "注册失败，"+err.Error(), c)
@@ -42,6 +42,7 @@ func Login(c *gin.Context) {
 	}
 	U := &model.SysUser{Username: L.Username, Password: L.Password}
 	if err, user := service.Login(U); err != nil {
+		print(err)
 		response.FailWithMessage("用户名不存在或者密码错误", c)
 	} else {
 		tokenNext(c, *user)
