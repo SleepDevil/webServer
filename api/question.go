@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -58,16 +59,25 @@ func GetTopic(c *gin.Context) {
 		return
 	}
 	rand.Seed(time.Now().Unix())
-	randIndex := rand.Intn(len(TopicArr))
-	// 随机返回一个topic
-	var randomData model.Topic = TopicArr[randIndex]
+	randIndex1 := rand.Intn(len(TopicArr))
+	randIndex2 := rand.Intn(len(TopicArr))
+	// 随机返回一个topic数组，长度为2
+	resArr := make([]model.Topic, 0)
+	resArr = append(resArr, TopicArr[randIndex1], TopicArr[randIndex2])
+	fmt.Println(resArr)
+	var FirstQuestion model.Topic = TopicArr[randIndex1]
+	var SecondQuestion model.Topic = TopicArr[randIndex2]
+	fmt.Println(FirstQuestion.TopicName)
+	fmt.Println(SecondQuestion.TopicName)
+	marshalData, err := json.Marshal(resArr)
+	fmt.Println(err)
 
-	_, err = global.GVA_REDIS.Set(ctx, resData.RoomId, randomData.TopicName, time.Duration(30*time.Second)).Result()
+	_, err = global.GVA_REDIS.Set(ctx, resData.RoomId, marshalData, 60*60*24*time.Second).Result()
 	if err != nil {
 		response.FailWithDetailed(err.Error(), "失败", c)
 		return
 	}
-	response.OkWithDetailed(TopicArr[randIndex], "成功", c)
+	response.OkWithDetailed(resArr, "成功", c)
 }
 
 func GetPart2Question(c *gin.Context) {
@@ -81,5 +91,6 @@ func GetPart2Question(c *gin.Context) {
 		return
 	}
 	fmt.Println(val)
+	// tempData := json.Unmarshal()
 	response.OkWithDetailed(val, "成功", c)
 }

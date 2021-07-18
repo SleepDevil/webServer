@@ -33,7 +33,6 @@ func CreateTask(c *gin.Context) {
 
 func GetTasks(c *gin.Context) {
 	err, taskLists, total := service.GetTask()
-	fmt.Println(taskLists)
 	if err != nil {
 		response.FailWithMessage("失败", c)
 	} else {
