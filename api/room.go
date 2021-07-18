@@ -40,12 +40,7 @@ func CreateRoom(c *gin.Context) {
 	response.OkWithMessage("创建成功", c)
 	time.AfterFunc(time.Second*time_gap, func() {
 		fmt.Println("timeafter后执行了！！！")
-		err, roomReturn := service.CreateRoom(*room)
-		if err != nil {
-			response.FailWithDetailed(err.Error(), "创建失败", c)
-		} else {
-			response.OkWithDetailed(roomReturn, "创建成功", c)
-		}
+		service.CreateRoom(*room)
 	})
 }
 

@@ -27,6 +27,7 @@ func RunWindowsServer() {
 	Router.POST("/getidentity", api.GetIdentity)
 	Router.POST("/getquestions", api.GetQuestions)
 	Router.POST("/gettopic", api.GetTopic)
+	Router.POST("/part2question", api.GetPart2Question)
 	Router.Run()
 	// print(s)
 	// time.Sleep(10 * time.Microsecond)

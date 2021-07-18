@@ -18,14 +18,14 @@ func GetIdentity(c *gin.Context) {
 	c.BindJSON(&json)
 	toFind := json.Username
 	user := map[string]interface{}{}
-	global.GVA_DB.Model(&model.SysUser{}).Where("username = ?", toFind).First(&user)
+	global.GVA_DB.Debug().Model(&model.SysUser{}).Where("username = ?", toFind).First(&user)
 	fmt.Println(user)
 	if user["identity"] == 1 {
-		response.OkWithDetailed("学生", "成功", c)
+		response.OkWithDetailed("study", "成功", c)
 		return
 	}
 	if user["identity"] == 2 {
-		response.OkWithDetailed("已工作", "成功", c)
+		response.OkWithDetailed("work", "成功", c)
 		return
 	}
 

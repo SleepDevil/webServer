@@ -3,6 +3,7 @@ package initialize
 import (
 	"context"
 	"fmt"
+	"time"
 	"yasi_audio/global"
 
 	"github.com/go-redis/redis/v8"
@@ -24,4 +25,7 @@ func Redis() {
 		fmt.Println("成功", pong)
 		global.GVA_REDIS = client
 	}
+	client.Set(ctx, "159512", "haluo", time.Duration(32))
+	val, err := client.Get(ctx, "159512").Result()
+	fmt.Println(val)
 }
